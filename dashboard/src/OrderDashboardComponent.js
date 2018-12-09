@@ -16,11 +16,14 @@ class OrderDashboardComponent extends React.Component {
 
     componentDidMount() {
         const self = this;
+
+        // Récupération des commandes lorsque le composant est monté
         axios.get('/orders')
             .then(function (response) {
                 // handle success
                 if (_.isNil(response.data.status)) {
                     // success
+                    // mise à jour du state
                     self.setState({
                         isLoading: false,
                         orders: response.data,
@@ -47,6 +50,7 @@ class OrderDashboardComponent extends React.Component {
 
         let renderComponent = null;
 
+        // Choix du composant à afficher en fonction du state
         if (this.state.isLoading) {
             renderComponent = <h4>Loading...</h4>;
         } else {

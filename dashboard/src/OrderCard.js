@@ -11,6 +11,7 @@ class OrderCard extends React.Component {
         this.setOrderStatus = this.setOrderStatus.bind(this);
     }
 
+    // Fonction executée lorsque l'utilisateur valide ou refuse une commande
     setOrderStatus(event, status) {
         event.preventDefault();
 
@@ -33,6 +34,7 @@ class OrderCard extends React.Component {
 
         let controlComponent = null;
 
+        // Choix du composant à afficher en fonction du statut d'une commande
         if (_.isNil(this.state.status)) {
             controlComponent = (
                 <div>
