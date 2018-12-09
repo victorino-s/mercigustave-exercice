@@ -86,7 +86,6 @@ class GustaveFormular extends React.Component {
 
             axios.post('/orders', orderData)
                 .then(res => {
-                    console.log(res);
                     if (res.data.status === "success") {
                         this.setState({
                             isLoading: false,
