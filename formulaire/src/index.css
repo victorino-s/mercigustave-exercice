@@ -1,0 +1,13 @@
+.invalid-field {
+  border-color: crimson;
+}
+
+.hidden-element {
+  display: none;
+}
+
+.visible-warning-msg {
+  display: block;
+  color: crimson;
+  padding: 20px;
+}
