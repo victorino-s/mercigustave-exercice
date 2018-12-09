@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import { string } from 'prop-types';
+import axios from 'axios';
 
 class GustaveFormular extends React.Component {
     constructor(props) {
@@ -15,7 +15,9 @@ class GustaveFormular extends React.Component {
             telephone: "",
             validEmail: true,
             validTelephone: true,
-            isFormValid: true
+            isFormValid: true,
+            isLoading: false,
+            serverResponse: ''
         }
 
         this.handleInputChanged = this.handleInputChanged.bind(this);
@@ -26,12 +28,6 @@ class GustaveFormular extends React.Component {
     }
 
     handleInputChanged(event) {
-        if (event.target.id === "email") {
-            if (this.verifyEmailValidity(event.target.value)) {
-
-            }
-        }
-
         this.setState({
             [event.target.id]: event.target.value
         });
@@ -78,21 +74,47 @@ class GustaveFormular extends React.Component {
     sendForm(event) {
         event.preventDefault();
 
-        if(this.validateForm()) {
+        if (this.validateForm()) {
 
             const orderData = {
-                address: `${this.state.deliveryAddress}${this.state.addressExtraInfos.length > 0 ? ' - ' + this.state.addressExtraInfos : null}`,
+                address: `${this.state.deliveryAddress}${this.state.addressExtraInfos.length > 0 ? ' - ' + this.state.addressExtraInfos : ''}`,
                 lastname: this.state.lastname,
                 firstname: this.state.firstname,
                 email: this.state.email,
                 telephone: this.state.telephone
             };
 
-            console.log("Formulaire valide , prêt à envoyer", orderData);
-
-            this.setState({
-                isFormValid: true
-            });
+            axios.post('/orders', orderData)
+                .then(res => {
+                    console.log(res);
+                    if (res.data.status === "success") {
+                        this.setState({
+                            isLoading: false,
+                            serverResponse: "Commande passée avec succès !",
+                            deliveryAddress: "",
+                            addressExtraInfos: "",
+                            lastname: "",
+                            firstname: "",
+                            email: "",
+                            telephone: "",
+                            validEmail: true,
+                            validTelephone: true,
+                            isFormValid: true,
+                        });
+                    } else {
+                        this.setState({
+                            isLoading: false,
+                            serverResponse: "Une erreur est survenue.",
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Erreur lors de la commande : ", error);
+                    this.setState({
+                        isLoading: false,
+                        serverResponse: "Une erreur est survenue.",
+                    });
+                })
         } else {
             this.setState({
                 isFormValid: false
@@ -118,8 +140,9 @@ class GustaveFormular extends React.Component {
                     <input type="email" className={`form-control ${this.state.validEmail ? null : 'invalid-field'}`} placeholder="Email" id="email" onChange={this.handleEmailChanged} value={this.state.email} />
                     <input type="tel" className={`form-control ${this.state.validTelephone ? null : 'invalid-field'}`} placeholder="Téléphone" id="telephone" value={this.state.telephone} onChange={this.handleTelephoneChanged} />
                 </div>
-                <button type="submit" className="btn btn-primary" onClick={this.sendForm}>Envoyer</button>
+                <button type="submit" className="btn btn-primary" disabled={this.state.isLoading} onClick={this.sendForm}>{`${this.state.isLoading ? 'Envoi...' : 'Envoyer'}`}</button>
                 <small className={`${this.state.isFormValid ? 'hidden-element' : 'visible-warning-msg'}`}>Des informations sont manquantes !</small>
+                <small className={`${this.state.serverResponse.length === 0 ? 'hidden-element' : 'visible-msg'}`}>{this.state.serverResponse}</small>
             </form>
         )
     }

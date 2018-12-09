@@ -11,3 +11,8 @@
   color: crimson;
   padding: 20px;
 }
+
+.visible-msg {
+  display: block;
+  padding: 20px;
+}
